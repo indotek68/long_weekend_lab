@@ -1,0 +1,34 @@
+.container {
+	background-color: orange;
+	width: 50em;
+	height: 30em;
+}
+
+.block {
+	background-image: url(../img/icon_38874.svg);
+	width: 6em;
+	height: 6em;
+	float: left;
+	margin: 10em auto;
+	position: relative;
+}
+
+.bullet {
+	background-color: red;
+	width: 1em;
+	height: 1em;
+	position: relative;
+	margin: 0 auto;
+}
+
+/*#backgrounddiv {
+    background-image: url(../img/sea.svg);
+}
+*/
+/*.canvas-bg {
+    background: -webkit-canvas(animation) no-repeat 50% 50%;
+  }*/
+
+<script>
+  var ctx = document.getCSSCanvasContext('2d', 'animation', 300, 300);
+</script>

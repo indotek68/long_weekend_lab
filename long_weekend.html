@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> -->
+	<script src="public/script/jquery-2.1.1.min.js"></script>
+	<script src="public/script/paper-full.min.js"></script>
+	<link rel="stylesheet" href="public/style/style.css">
+	<title>Long Weekend</title>
+</head>
+<body>
+<!-- 	<form>
+  <input id="target" type="text" value="Hello there">
+</form>
+<div id="other">
+  Trigger the handler
+</div> -->
+		<div class="container">
+			<div class="block">
+				<div class="bullet"></div>
+			</div>
+		</div>
+</body>
+</html>
+
+<script>
+
+
+
+	var keyPress = function (e){
+		switch(e.which) {
+			case 37:// left
+				$(".block").animate({ left: "-=1em" }, 100);
+			break;
+
+			case 38:// up
+				$(".block").animate({ top: "-=1em" }, 100);
+			break;
+
+			case 39:// right
+				$(".block").animate({ left: "+=1em" }, 100);
+				// var block = $(".block")
+				// var left = parseInt(block.css("left"));
+				// console.log("left", left)
+				// if (isNaN(left)) {
+				// 	left = 0
+				// }
+				// block.css("left", left + 10)
+			break;
+
+			case 40:// down
+				$(".block").animate({ top: "+=1em" }, 100);
+			break;
+
+			case 32: //spacebar
+				$(".bullet").css("background-color", "blue").animate({ opacity: "toggle",top: "-20em"}, 1000);
+			break;
+
+			default: return;
+		}
+		e.preventDefault();
+	};
+
+$("body").on("keydown", keyPress)
+
+
+	// $("body").on("keydown", function(e){
+	// 	switch(e.which) {
+	// 		case 37:// left
+	// 			$(".block").animate({ left: "-=1em" }, 100);
+	// 		break;
+
+	// 		case 38:// up
+	// 			$(".block").animate({ top: "-=1em" }, 100);
+	// 		break;
+
+	// 		case 39:// right
+	// 			$(".block").animate({ left: "+=1em" }, 100);
+	// 		break;
+
+	// 		case 40:// down
+	// 			$(".block").animate({ top: "+=1em" }, 100);
+	// 		break;
+
+	// 		case 32: //spacebar
+	// 			$(".bullet").css("background-color", "blue").animate({ top: "-20em"}, 1000);
+	// 		break;
+
+	// 		default: return;
+	// 	}
+	// 	e.preventDefault();
+	// });
+
+// $( "body" ).on("keydown",function() {
+//   $("#other").css("background-color", "red")
+// });
+</script>

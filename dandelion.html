@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>Paper Test</title>
+	
+	<script src="public/script/jquery-2.1.1.min.js"></script>
+	<script src="public/script/paper-full.min.js"></script>
+	<link rel="stylesheet" href="public/style/style.css">
+</head>
+<body>
+	<div id="backgrounddiv" style="position:absolute; top:0; left:0; z-index:-1">
+  <canvas id="myCanvas" resize style='background:4D9BCC'></canvas>
+</div>
+
+
+<script type="text/paperscript" canvas="myCanvas">
+
+var path = new Path();
+
+path.strokeColor = '#567e37';
+path.strokeWidth = 5;
+
+var firstPoint = new Point(0, 550);
+path.add(firstPoint)
+
+var throughPoint = new Point(75, 400);
+var toPoint = new Point(100, 250);
+path.arcTo(throughPoint, toPoint)
+
+path.fullySelected = true;
+
+var circle = new Path.Circle(throughPoint, 5)
+circle.fillColor = '#CC0000';
+
+var bulb = new Path.Circle(toPoint, 10);
+bulb.fillColor = '#567e37';
+
+var size = new Size(4, 10);
+var rectangle = new Rectangle(toPoint, size);
+var bottom = new Path.Oval(rectangle);
+bottom.fillColor = '#d0aa7b';
+
+
+</script>
+
+</body>
+</html>
