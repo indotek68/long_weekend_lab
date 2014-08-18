@@ -2,14 +2,14 @@
 
 <html>
 <head>
-	<title>Paper Test</title>
-	
-	<script src="public/script/jquery-2.1.1.min.js"></script>
-	<script src="public/script/paper-full.min.js"></script>
-	<link rel="stylesheet" href="public/style/style.css">
+    <title>Paper Test</title>
+    
+    <script src="public/script/jquery-2.1.1.min.js"></script>
+    <script src="public/script/paper-full.min.js"></script>
+    <link rel="stylesheet" href="public/style/style.css">
 </head>
 <body>
-	<div id="backgrounddiv" style="position:absolute; top:0; left:0; z-index:-1">
+    <div id="backgrounddiv" style="position:absolute; top:0; left:0; z-index:-1">
         <canvas id="myCanvas" resize style='background:4D9BCC'> </canvas>
     </div>
 
@@ -147,82 +147,119 @@
 
 
 <script type="text/paperscript" canvas="myCanvas">
-var canvas= document.getElementById( 'myCanvas' );
-paper.setup(canvas);
-// var img = document.createElement('img')
-// img.src = './public/img/sea.svg';
-// img.id = 'background';
-// var backgroundLayer = new paper.Layer();
-// var raster = new paper.Raster({
-//     source: img.src,
-//     position: view.center
-// });
-
-
-// $('#backgrounddiv').css("background-color", 'grey')
-//$('#backgrounddiv').transition({y: '100px'})
- 
 $('#small_cloud').css("visibility", 'hidden')
 $('#small_cloud2').css("visibility", 'hidden')
 $('#medium_cloud').css("visibility", 'hidden')
+$('#plane').css("visibility", 'hidden')
 $('#background').css("visibility", 'hidden')
-// var background = project.importSVG(document.getElementById('background'))
-// background.sendtoBack
-
-var count = 4;
-var tileCounterWidth = 0;
-var tileCounterHeight = 0;
-var tileCounter = (view.size.width/100) + 1;
-var seaGroupWidth = new Group ();
-var seaGroup = new Group();
-var firstLayer = project.activeLayer;
-var secondLayer = new Layer();
-
-var smallCloud = project.importSVG(document.getElementById('small_cloud'))
-var smallCloud2 = project.importSVG(document.getElementById('small_cloud2'))
-var plane = project.importSVG(document.getElementById('plane'))
-
-var symbolPlane = new Symbol(plane);
-secondLayer.addChildren(symbolPlane);
-
-var placedPlane = symbolPlane.place(view.center)
 
 
-for(var i = 0; i < count; i ++){
-	var symbolSmallCloud = new Symbol(smallCloud);
-	var center = new (Point.random() * view.size);
-	placedSmallCloud = symbolSmallCloud.place(center)
+var canvas= document.getElementById( 'myCanvas' );
+paper.setup(canvas);
 
-	placedSmallCloud.scale(i);
-	placedSmallCloud.opacity = (i/10);
+var mousePos = view.center + [view.bounds.width / 2, 100];
+var position = view.center;
 
-	var symbolSmallCloud2 = new Symbol(smallCloud2);
-	var center = new (Point.random() * view.size);
-
-	placedSmallCloud2 = symbolSmallCloud2.place(center)
-	placedSmallCloud2.scale(i);
-	placedSmallCloud2.opacity = (i/10);
+function onFrame(event) {
+    position += (mousePos - position) / 20;
+    var vector = (view.center - position) / 10;
+    moveStars(vector*3);
 }
 
-// seaTile();
+// function onMouseMove(event) {
+//     mousePos = event.point;
+//     console.log(mousePos)
+// }
 
-	function onFrame(event) {
-		// Run through the active layer's children list and change
-		// the position of the placed symbols:
-		for (var i = 0; i < count*2 + 1; i++) {
-			var item = firstLayer.children[i];
-			
-			// Move the item 1/20th of its width to the right. This way
-			// larger circles move faster than smaller circles:
-			item.position.y += (item.bounds.height) / 50;
+function onKeyDown(event) {
+    if(event.key == 'a') {
+        mousePos -= position.x/10;
+    }
 
-			// If the item has left the view on the right, move it back
-			// to the left:
-			if (item.bounds.top > view.size.height) {
-				item.position.y = -item.bounds.height;
-			}
-		}
-	}
+    if(event.key == 'd') {
+        mousePos += position.x/10;
+    }
+
+    if(event.key == 'w') {
+        mousePos -= position.y/10;
+    }
+
+    if(event.key == 's') {
+        mousePos += position.y/10;
+    }
+    console.log(mousePos)
+}
+
+// function onKeyDown(event) {
+//     if (event.key == 'space')
+//         project.activeLayer.selected = !project.activeLayer.selected;
+// }
+
+var moveStars = new function() {
+    // The amount of symbol we want to place;
+    var count = 50;
+
+    // Create a symbol, which we will use to place instances of later:
+    var smallCloud = project.importSVG(document.getElementById('small_cloud'))
+
+    var symbol = new Symbol(smallCloud);
+
+    // Place the instances of the symbol:
+    for (var i = 0; i < count; i++) {
+        // The center position is a random point in the view:
+        var center = Point.random() * view.size;
+        var placed = symbol.place(center);
+        placed.scale(i/25);
+        placed.opacity = (i/count);
+        placed.data = {
+            vector: new Point({
+                angle: Math.random() * 360,
+                length : (i / count) * Math.random() / 5
+            })
+        };
+    }
+
+    var vector = new Point({
+        angle: 45,
+        length: 0
+    });
+
+    function keepInView(item) {
+        var position = item.position;
+        var viewBounds = view.bounds;
+        if (position.isInside(viewBounds))
+            return;
+        var itemBounds = item.bounds;
+        if (position.x > viewBounds.width + 5) {
+            position.x = -item.bounds.width;
+        }
+
+        if (position.x < -itemBounds.width - 5) {
+            position.x = viewBounds.width;
+        }
+
+        if (position.y > viewBounds.height + 5) {
+            position.y = -itemBounds.height;
+        }
+
+        if (position.y < -itemBounds.height - 5) {
+            position.y = viewBounds.height
+        }
+    }
+
+    return function(vector) {
+        // Run through the active layer's chilren list and change
+        // the position of the placed symbols:
+        var layer = project.activeLayer;
+        for (var i = 0; i < count; i++) {
+            var item = layer.children[i];
+            var size = item.bounds.size;
+            var length = vector.length / 20 * size.width / 10;
+            item.position += vector.normalize(length)/10 + item.data.vector;
+            keepInView(item);
+        }
+    };
+};      
 
 </script>
 </html>
