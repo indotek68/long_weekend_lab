@@ -190,6 +190,7 @@ $('#plane').css("visibility", 'hidden')
 $('#background').css("visibility", 'hidden')
 $('#fat_cloud').css("visibility", 'hidden')
 $('#backgrounddiv').css("background-color", '#4D7399')
+$('#backgrounddiv').css("background-image", 'url(./public/img/sea.svg)')
 
 
 var canvas= document.getElementById( 'myCanvas' );
@@ -197,12 +198,16 @@ paper.setup(canvas);
 
 var mousePos = view.center + [view.bounds.width / 3, 100];
 var position = view.center;
+var posX = mousePos.x
+var posY = mousePos.y
 console.log(view)
 
-function onFrame(event) {
+function onFrame(event, event) {
     position += (mousePos - position) / 10;
     var vector = (view.center - position) / 10;
     moveStars(vector*3);
+    movePlane(vector);
+
 }
 
 // function onMouseMove(event) {
@@ -226,13 +231,10 @@ function onKeyDown(event) {
     if(event.key == 's') {
         mousePos.y += view.center.y/5
     }
-    console.log(mousePos)
-}
 
-// function onKeyDown(event) {
-//     if (event.key == 'space')
-//         project.activeLayer.selected = !project.activeLayer.selected;
-// }
+    if (event.key == 'space')
+        project.activeLayer.selected = !project.activeLayer.selected;
+}
 
 var moveStars = new function() {
     // The amount of symbol we want to place;
@@ -244,16 +246,17 @@ var moveStars = new function() {
     var mediumCloud = project.importSVG(document.getElementById('medium_cloud'));
     var fatCloud = project.importSVG(document.getElementById('fat_cloud'));
 
-    var symbol = new Symbol(smallCloud);
+    
 
     // Place the instances of the symbol:
     for (var i = 0; i < count; i++) {
         // The center position is a random point in the view:
+        var symbolSmallCloud = new Symbol(smallCloud);
         var center = Point.random() * view.size;
-        var placed = symbol.place(center);
-        placed.scale(i/3 + .5);
-        placed.opacity = (i / 6);
-        placed.data = {
+        var placedSmallCloud = symbolSmallCloud.place(center);
+        placedSmallCloud.scale(i/3 + .5);
+        placedSmallCloud.opacity = (i / 6);
+        placedSmallCloud.data = {
             vector: new Point({
                 angle: Math.random() * 360,
                 length : (i / count) * Math.random() / 5
@@ -309,20 +312,28 @@ var moveStars = new function() {
         if (position.isInside(viewBounds))
             return;
         var itemBounds = item.bounds;
-        if (position.x > viewBounds.width + 5) {
-            position.x = -item.bounds.width;
-        }
+        // if (position.x > viewBounds.width + 5) {
+        //     position.x = -item.bounds.width;
+        // }
+
+        if (item.bounds.left > view.size.width + 5) {
+                item.position.x = -item.bounds.width;
+            }
 
         if (position.x < -itemBounds.width - 5) {
-            position.x = viewBounds.width;
+            position.x = viewBounds.width + 60;
         }
 
-        if (position.y > viewBounds.height + 5) {
-            position.y = -itemBounds.height;
-        }
+        // if (position.y > viewBounds.height + 5) {
+        //     position.y = -itemBounds.height;
+        // }
+
+        if (item.bounds.top > view.size.height + 5) {
+                item.position.y = -item.bounds.height;
+            }
 
         if (position.y < -itemBounds.height - 5) {
-            position.y = viewBounds.height
+            position.y = viewBounds.height + 60;
         }
     }
 
@@ -338,7 +349,39 @@ var moveStars = new function() {
             keepInView(item);
         }
     };
-};      
+};
+
+var movePlane = new function(){
+    var plane = project.importSVG(document.getElementById('plane'));
+    var symbolPlane = new Symbol(plane);
+    symbolPlane.definition.fillColor = 'black'
+    // symbolPlane.definition.shadowColor = new Color('black')
+    // symbolPlane.definition.shadowBlur = 15
+    // symbolPlane.definition.shadowOffset = new Point(30,30)
+    var center = view.center;
+    placedSymbolPlane = symbolPlane.place(center)
+    placedSymbolPlaneShadow = symbolPlane.place(center + new Point(40,40))
+     placedSymbolPlaneShadow.opacity = .35
+     placedSymbolPlaneShadow.scale(.75)
+     placedSymbolPlane.data = {
+            vector: new Point({
+                angle: Math.random() * 360,
+                length : (10) * Math.random() / 5
+            })
+        };
+   
+
+
+    return function(vector) {
+        var layer = project.activeLayer;
+        for (var i = 0; i < 1; i++) {
+            var item = layer.children[i];
+            var size = item.bounds.size;
+            var length = vector.length / 50 * size.width /50;
+            item.position += (vector.normalize(length) + item.data.vector);
+        }
+    };
+}    
 
 </script>
 </html>
