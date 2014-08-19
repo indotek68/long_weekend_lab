@@ -183,6 +183,7 @@
 
 
 <script type="text/paperscript" canvas="myCanvas">
+
 $('#small_cloud').css("visibility", 'hidden')
 $('#small_cloud2').css("visibility", 'hidden')
 $('#medium_cloud').css("visibility", 'hidden')
@@ -190,7 +191,7 @@ $('#plane').css("visibility", 'hidden')
 $('#background').css("visibility", 'hidden')
 $('#fat_cloud').css("visibility", 'hidden')
 $('#backgrounddiv').css("background-color", '#4D7399')
-$('#backgrounddiv').css("background-image", 'url(./public/img/sea.svg)')
+// $('#backgrounddiv').css("background-image", 'url(./public/img/sea.svg)')
 
 
 var canvas= document.getElementById( 'myCanvas' );
@@ -198,22 +199,16 @@ paper.setup(canvas);
 
 var mousePos = view.center + [view.bounds.width / 3, 100];
 var position = view.center;
-var posX = mousePos.x
-var posY = mousePos.y
-console.log(view)
+
 
 function onFrame(event, event) {
     position += (mousePos - position) / 10;
+    console.log(view.bounds.width)
     var vector = (view.center - position) / 10;
-    moveStars(vector*3);
+    moveClouds(vector*3);
     movePlane(vector);
 
 }
-
-// function onMouseMove(event) {
-//     mousePos = event.point;
-//     console.log(mousePos)
-// }
 
 function onKeyDown(event) {
     if(event.key == 'a') {
@@ -236,11 +231,11 @@ function onKeyDown(event) {
         project.activeLayer.selected = !project.activeLayer.selected;
 }
 
-var moveStars = new function() {
+var moveClouds = new function() {
     // The amount of symbol we want to place;
     var count = 6;
 
-    // Create a symbol, which we will use to place instances of later:
+    // Grabs the svg
     var smallCloud = project.importSVG(document.getElementById('small_cloud'));
     var smallCloud2 = project.importSVG(document.getElementById('small_cloud2'));
     var mediumCloud = project.importSVG(document.getElementById('medium_cloud'));
@@ -250,9 +245,10 @@ var moveStars = new function() {
 
     // Place the instances of the symbol:
     for (var i = 0; i < count; i++) {
-        // The center position is a random point in the view:
+       //creates symbols of the svg
         var symbolSmallCloud = new Symbol(smallCloud);
         var center = Point.random() * view.size;
+        //places the symbol
         var placedSmallCloud = symbolSmallCloud.place(center);
         placedSmallCloud.scale(i/3 + .5);
         placedSmallCloud.opacity = (i / 6);
@@ -265,7 +261,8 @@ var moveStars = new function() {
 
         var center = Point.random() * view.size;
         var symbolMediumCloud = new Symbol(mediumCloud);
-        placedMediumCloud = symbolMediumCloud.place(center)
+        
+        var placedMediumCloud = symbolMediumCloud.place(center)
         placedMediumCloud.scale(i/2 + .5);
         placedMediumCloud.opacity = (i/6);
         placedMediumCloud.data = {
@@ -277,7 +274,8 @@ var moveStars = new function() {
 
         var center = Point.random() * view.size + 6;
         var symbolSmallCloud2 = new Symbol(smallCloud2);
-        placedSmallCloud2 = symbolSmallCloud2.place(center)
+        
+        var placedSmallCloud2 = symbolSmallCloud2.place(center)
         placedSmallCloud2.scale(i/3 + 1);
         placedSmallCloud2.opacity = (i/30);
         placedSmallCloud2.data = {
@@ -289,7 +287,8 @@ var moveStars = new function() {
 
         var center = Point.random() * view.size;
         var symbolFatCloud = new Symbol(fatCloud);
-        placedFatCloud = symbolFatCloud.place(center)
+        
+        var placedFatCloud = symbolFatCloud.place(center)
         placedFatCloud.scale(i/2.5 + 1);
         placedFatCloud.opacity = (i/6);
         placedFatCloud.data = {
@@ -312,9 +311,6 @@ var moveStars = new function() {
         if (position.isInside(viewBounds))
             return;
         var itemBounds = item.bounds;
-        // if (position.x > viewBounds.width + 5) {
-        //     position.x = -item.bounds.width;
-        // }
 
         if (item.bounds.left > view.size.width + 5) {
                 item.position.x = -item.bounds.width;
@@ -323,10 +319,6 @@ var moveStars = new function() {
         if (position.x < -itemBounds.width - 5) {
             position.x = viewBounds.width + 60;
         }
-
-        // if (position.y > viewBounds.height + 5) {
-        //     position.y = -itemBounds.height;
-        // }
 
         if (item.bounds.top > view.size.height + 5) {
                 item.position.y = -item.bounds.height;
@@ -338,7 +330,7 @@ var moveStars = new function() {
     }
 
     return function(vector) {
-        // Run through the active layer's chilren list and change
+        // Run through the active layer's children list and change
         // the position of the placed symbols:
         var layer = project.activeLayer;
         for (var i = 0; i < count*4; i++) {
@@ -352,35 +344,31 @@ var moveStars = new function() {
 };
 
 var movePlane = new function(){
+    //grabs the plane svg
     var plane = project.importSVG(document.getElementById('plane'));
     var symbolPlane = new Symbol(plane);
     symbolPlane.definition.fillColor = 'black'
     // symbolPlane.definition.shadowColor = new Color('black')
     // symbolPlane.definition.shadowBlur = 15
     // symbolPlane.definition.shadowOffset = new Point(30,30)
+
     var center = view.center;
-    placedSymbolPlane = symbolPlane.place(center)
-    placedSymbolPlaneShadow = symbolPlane.place(center + new Point(40,40))
-     placedSymbolPlaneShadow.opacity = .35
-     placedSymbolPlaneShadow.scale(.75)
-     placedSymbolPlane.data = {
+    //places the plane symbol
+    var placedSymbolPlane = symbolPlane.place(center)
+    //creates and offsets another symbol of the plane. Plane shadow
+    var placedSymbolPlaneShadow = symbolPlane.place(center + new Point(40,40))
+    placedSymbolPlaneShadow.opacity = .35
+    placedSymbolPlaneShadow.scale(.75)
+    placedSymbolPlane.data = {
             vector: new Point({
                 angle: Math.random() * 360,
                 length : (10) * Math.random() / 5
             })
         };
-   
 
+    return function(){
 
-    return function(vector) {
-        var layer = project.activeLayer;
-        for (var i = 0; i < 1; i++) {
-            var item = layer.children[i];
-            var size = item.bounds.size;
-            var length = vector.length / 50 * size.width /50;
-            item.position += (vector.normalize(length) + item.data.vector);
-        }
-    };
+    }
 }    
 
 </script>
