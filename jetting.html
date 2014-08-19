@@ -203,7 +203,6 @@ var position = view.center;
 
 function onFrame(event, event) {
     position += (mousePos - position) / 10;
-    console.log(view.bounds.width)
     var vector = (view.center - position) / 10;
     moveClouds(vector*3);
     movePlane(vector);
@@ -231,7 +230,7 @@ function onKeyDown(event) {
         project.activeLayer.selected = !project.activeLayer.selected;
 }
 
-var moveClouds = new function() {
+function Clouds() {
     // The amount of symbol we want to place;
     var count = 6;
 
@@ -343,7 +342,9 @@ var moveClouds = new function() {
     };
 };
 
-var movePlane = new function(){
+var moveClouds = new Clouds;
+
+function Plane(){
     //grabs the plane svg
     var plane = project.importSVG(document.getElementById('plane'));
     var symbolPlane = new Symbol(plane);
@@ -369,7 +370,9 @@ var movePlane = new function(){
     return function(){
 
     }
-}    
+}
+
+var movePlane = new Plane;
 
 </script>
 </html>
